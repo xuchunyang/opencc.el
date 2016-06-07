@@ -94,5 +94,19 @@
       (message "%s" result))
     result))
 
+;;;###autoload
+(defun opencc-replace-in-region (start end &optional config)
+  (interactive
+   (let ((config (when current-prefix-arg
+                   (completing-read
+                    "转化方式: "
+                    (list "s2t" "t2s" "s2tw" "tw2s" "s2hk" "hk2s" "s2twp" "tw2sp")))))
+     (list (region-beginning) (region-end) config)))
+  (unless config (setq config "s2t"))
+  (let* ((text (buffer-substring-no-properties start end))
+         (converted (opencc text config)))
+    (delete-region start end)
+    (insert converted)))
+
 (provide 'opencc)
 ;;; opencc.el ends here
