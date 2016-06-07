@@ -41,6 +41,9 @@
 ;;;###autoload
 (defun opencc-use-api (text config)
   "Use the OpenCC C API to convert text with CONFIG (a string)."
+  (setq config (if (stringp config)
+                   config
+                 (symbol-name config)))
   (opencc-core text config))
 
 (defconst opencc-temp-file (make-temp-file "opencc-"))
@@ -48,6 +51,9 @@
 ;;;###autoload
 (defun opencc-use-cli (text config)
   "Use opencc(1) to convert TEXT with CONFIG (a string)."
+  (setq config (if (stringp config)
+                   config
+                 (symbol-name config)))
   (with-temp-buffer
     (insert text)
     (write-region nil nil opencc-temp-file nil 0)
@@ -78,8 +84,12 @@
                     "转化方式: "
                     (list "s2t" "t2s" "s2tw" "tw2s" "s2hk" "hk2s" "s2twp" "tw2sp")))))
      (list text config)))
-  (let* ((config (format "%s" (or config "s2t")))
-         (result (funcall opencc-function text config)))
+  (unless config
+    (setq config "s2t"))
+  (setq config (if (stringp config)
+                   config
+                 (symbol-name config)))
+  (let ((result (funcall opencc-function text config)))
     (when (called-interactively-p)
       (message "%s" result))
     result))
