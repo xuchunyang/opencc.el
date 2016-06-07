@@ -8,17 +8,6 @@
 int plugin_is_GPL_compatible;
 
 static emacs_value
-Fopencc_sample (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void *data)
-{
-  char input[] = "开放中文转换";
-  opencc_t opencc = opencc_open (NULL);
-  char *res = opencc_convert_utf8 (opencc, input, strlen (input));
-  emacs_value rtv = env->make_string (env, res, strlen (res));
-  opencc_convert_utf8_free (res);
-  return rtv;
-}
-
-static emacs_value
 Fopencc_core (emacs_env *env, ptrdiff_t nargs, emacs_value args[], void *data)
 {
   emacs_value lisp_str;
@@ -72,7 +61,6 @@ emacs_module_init (struct emacs_runtime *ert)
   bind_function (env, lsym, \
                  env->make_function (env, amin, amax, csym, doc, data));
 
-  DEFUN ("opencc-sample", Fopencc_sample, 0, 0, NULL, NULL);
   DEFUN ("opencc-core", Fopencc_core, 2, 2, NULL, NULL);
 #undef DEFUN
 
