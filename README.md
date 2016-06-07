@@ -1,6 +1,6 @@
 # opencc.el
 
-[OpenCC](https://github.com/BYVoid/OpenCC) 是一个中文简繁转换工具，`opencc.el` 是它的 Emacs 接口。`opencc.el` 的最初目的是为了了解 Emacs 25 的 dynamic module。
+[OpenCC](https://github.com/BYVoid/OpenCC) 是一个中文简繁转换工具，`opencc.el` 是它的 Emacs 接口。我写 `opencc.el` 的最初目的是为了了解 Emacs 25 新增的 [dynamic modules](http://diobla.info/blog-archive/modules-tut.html) 功能。
 
 ## Demo 示例
 
@@ -16,13 +16,13 @@
 
 ### `(opencc-use-api text config)`
 
-依据配置 CONFIG 转化 TEXT，利用 OpenCC C API 和 Emacs dynamic module 实现。
+依据配置 CONFIG 转化 TEXT，利用 [OpenCC 的 C API](http://byvoid.github.io/OpenCC/1.0.2/group__opencc__c__api.html) 和 Emacs dynamic modules 实现。
 
 *dynamic module 需要 Emacs 25 并需要在 configure 时用 `--with-modules` 开启支持*
 
 ### `(opencc-use-cli text config)`
 
-依据配置 CONFIG 转化 TEXT，利用 `opencc(1)` 实现。
+依据配置 CONFIG 转化 TEXT，利用 OpenCC 的命令行工具 `opencc(1)` 实现。
 
 ## Command 命令
 
@@ -53,3 +53,4 @@
 
 * OpenCC 项目主页 https://github.com/BYVoid/OpenCC
 * OpenCC C API http://byvoid.github.io/OpenCC/1.0.2/group__opencc__c__api.html
+* Emacs dynamic modules 的介绍 http://diobla.info/blog-archive/modules-tut.html
