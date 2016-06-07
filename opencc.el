@@ -20,27 +20,52 @@
 
 ;;; Commentary:
 
+;; OpenCC 是一个简繁转换工具，预设的配置文件有
 ;;
+;; s2t   Simplified Chinese to Traditional Chinese 简体到繁体
+;; t2s   Traditional Chinese to Simplified Chinese 繁体到简体
+;; s2tw  Simplified Chinese to Traditional Chinese (Taiwan Standard) 简体到台湾正体
+;; tw2s  Traditional Chinese (Taiwan Standard) to Simplified Chinese 台湾正体到简体
+;; s2hk  Simplified Chinese to Traditional Chinese (Hong Kong Standard) 简体到香港繁体（香港小学学习字词表标准）
+;; hk2s  Traditional Chinese (Hong Kong Standard) to Simplified Chinese 香港繁体（香港小学学习字词表标准）到简体
+;; s2twp Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom 简体到繁体（台湾正体标准）并转换为台湾常用词汇
+;; tw2sp Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁体（台湾正体标准）到简体并转换为中国大陆常用词汇"
+;;
+;;
+;; 在 `opencc.el' 中「配置文件」由 CONFIG 参数指定，类型为 String。
 
 ;;; Code:
 
-;; (add-to-list 'load-path
-;;              (file-name-directory (or #$ (expand-file-name (buffer-file-name)))))
+(require 'opencc-core nil t)
 
-(require 'opencc-core)
+;;;###autoload
+(defun opencc-use-api (text config)
+  "Use the OpenCC C API to convert text with CONFIG (a string)."
+  (opencc-core text config))
 
+(defconst opencc-temp-file (make-temp-file "opencc-"))
+
+;;;###autoload
+(defun opencc-use-cli (text config)
+  "Use opencc(1) to convert TEXT with CONFIG (a string)."
+  (with-temp-buffer
+    (insert text)
+    (write-region nil nil opencc-temp-file nil 0)
+    (delete-region 1 (point))
+    ;; WARNNING: opencc(1) returns 0 even with invalid config
+    (if (zerop (call-process "opencc" nil t nil
+                             "--config" config "--input" opencc-temp-file))
+        (buffer-string)
+      (error "Error: %s" (buffer-string)))))
+
+(defvar opencc-function
+  (if (file-exists-p (expand-file-name "opencc-core.so"))
+      #'opencc-use-api
+    #'opencc-use-cli))
+
+;;;###autoload
 (defun opencc (text &optional config)
-  "Convert TEXT according to CONFIG (`s2t' if not passed).
-
-CONFIG is a symbol or a string.
-s2t   Simplified Chinese to Traditional Chinese 简体到繁体
-t2s   Traditional Chinese to Simplified Chinese 繁体到简体
-s2tw  Simplified Chinese to Traditional Chinese (Taiwan Standard) 简体到台湾正体
-tw2s  Traditional Chinese (Taiwan Standard) to Simplified Chinese 台湾正体到简体
-s2hk  Simplified Chinese to Traditional Chinese (Hong Kong Standard) 简体到香港繁体（香港小学学习字词表标准）
-hk2s  Traditional Chinese (Hong Kong Standard) to Simplified Chinese 香港繁体（香港小学学习字词表标准）到简体
-s2twp Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom 简体到繁体（台湾正体标准）并转换为台湾常用词汇
-tw2sp Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁体（台湾正体标准）到简体并转换为中国大陆常用词汇"
+  "Convert TEXT with CONFIG (`s2t' if not passed or without prefix argument)."
   (interactive
    (let ((text
           (read-string
@@ -54,7 +79,7 @@ tw2sp Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland 
                     (list "s2t" "t2s" "s2tw" "tw2s" "s2hk" "hk2s" "s2twp" "tw2sp")))))
      (list text config)))
   (let* ((config (format "%s" (or config "s2t")))
-         (result (opencc-core text config)))
+         (result (funcall opencc-function text config)))
     (when (called-interactively-p)
       (message "%s" result))
     result))
