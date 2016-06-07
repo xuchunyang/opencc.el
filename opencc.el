@@ -32,7 +32,7 @@
 ;; tw2sp Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁体（台湾正体标准）到简体并转换为中国大陆常用词汇"
 ;;
 ;;
-;; 在 `opencc.el' 中「配置文件」由 CONFIG 参数指定，类型为 String。
+;; 在 `opencc.el' 中「配置文件」由 CONFIG 参数指定，类型为 String 或 Symbol。
 
 ;;; Code:
 
