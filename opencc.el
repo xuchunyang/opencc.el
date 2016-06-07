@@ -3,6 +3,8 @@
 ;; Copyright (C) 2016  Chunyang Xu
 
 ;; Author: Chunyang Xu <xuchunyang.me@gmail.com>
+;; URL: https://github.com/xuchunyang/opencc.el
+;; Version: 0.01
 ;; Keywords: Chinese
 
 ;; This program is free software; you can redistribute it and/or modify
