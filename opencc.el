@@ -66,6 +66,30 @@
         (buffer-string)
       (error "Error: %s" (buffer-string)))))
 
+;;;###autoload
+(defun opencc-file-use-cli (input-file output-file config)
+  "Use opencc(1) to convert INPUT-FILE to OUT-FILE with CONFIG.
+Notes: if OUTPUT-FILE exists, overwrites it."
+  (setq config (if (stringp config) config (symbol-name config)))
+  ;; WARNNING: opencc(1) returns 0 even with invalid config
+  (with-temp-buffer
+    (unless (zerop (call-process "opencc" nil t nil
+                                 "--input" input-file
+                                 "--output" output-file
+                                 "--config" config))
+      (error "Error: %s" (buffer-string)))))
+
+;;;###autoload
+(defun opencc-buffer-use-cli (input-buffer output-buffer config)
+  (with-current-buffer input-buffer
+    (write-region nil nil opencc-temp-file nil 0))
+  (with-current-buffer (get-buffer-create output-buffer)
+    (erase-buffer)
+    (unless (zerop (call-process "opencc" nil t nil
+                                 "--input" opencc-temp-file
+                                 "--config" config))
+      (error "Error: %s" (buffer-string)))))
+
 (defvar opencc-function
   (if (file-exists-p (expand-file-name "opencc-core.so"))
       #'opencc-use-api
